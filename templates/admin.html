@@ -1,0 +1,6 @@
+{% extends "base.html" %}{% block content %}
+<div class="card"><h2>Admin <span class="accent">/</span> All students</h2><p>Students sorted by placement chance.</p>
+<div class="table-wrap"><table><tr><th>Name</th><th>Date</th><th>Apt</th><th>Tech</th><th>Code</th><th>Logic</th><th>Placement %</th><th>Status</th><th></th></tr>
+{% for r in rows %}<tr><td>{{ r.name }}</td><td>{{ r.created[:10] }}</td><td>{{ r.aptitude|round(0) }}</td><td>{{ r.technical|round(0) }}</td>
+<td>{{ r.coding|round(0) }}</td><td>{{ r.logic|round(0) }}</td><td><b>{{ r.probability }}%</b></td><td>{{ r.label }}</td>
+<td><a href="{{ url_for('result', aid=r.id) }}">Details</a></td></tr>{% endfor %}</table></div></div>{% endblock %}

@@ -1,0 +1,19 @@
+{% extends "base.html" %}{% block content %}
+{% macro bar(label,v) %}<div>{{ label }}: <b>{{ v|round(1) }}%</b></div><div class="bar"><div style="width:{{ v }}%"></div></div>{% endmacro %}
+<div class="card hero hero-results"><h2>Placement <span class="accent">Prediction</span></h2>
+<div class="big">{{ d.pred.probability }}%</div><b>{{ d.pred.label }}</b>
+<p>Suitable target: {{ d.pred.companies }}</p></div>
+<div class="grid"><div class="card"><h3>Competency Scores</h3>
+{{ bar('Aptitude', a.aptitude) }}{{ bar('Technical', a.technical) }}{{ bar('Coding (test cases)', a.coding) }}{{ bar('Logic understanding (AI)', a.logic) }}</div>
+<div class="card"><h3>Improve these first</h3>{% for w in d.pred.weak_areas %}<span class="pill">{{ w|title }}</span>{% endfor %}
+<ul>{% for t in d.pred.tips %}<li>{{ t }}</li>{% endfor %}</ul></div></div>
+<div class="card"><h2>🧠 Logic Analysis (per coding problem)</h2>
+{% for p in d.problems %}<h3>{{ p.title }}</h3>
+<p>Code: <b>{{ p.run.passed }}/{{ p.run.total }}</b> tests passed {% if p.run.error %}<small>({{ p.run.error }})</small>{% endif %}
+&nbsp;|&nbsp; Logic score: <b>{{ p.logic.score }}/100</b> - {{ p.logic.level }}</p>
+<p class="explanation"><i>Your explanation:</i> {{ p.logic_text or '(empty)' }}</p>
+<p>Similarity to ideal: {{ p.logic.similarity }}% · Concept coverage: {{ p.logic.coverage }}% · Structure: {{ p.logic.structure }}%</p>
+<p>Concepts covered: {% for c in p.logic.concepts_hit %}<span class="pill">{{ c }}</span>{% endfor %}<br>
+Missed: {% for c in p.logic.concepts_missed %}<span class="pill missed">{{ c }}</span>{% endfor %}</p>
+<p>💡 {{ p.logic.feedback|join(' ') }}</p><p><b>Insight:</b> {{ p.insight }}</p><hr>{% endfor %}</div>
+<a class="btn" href="{{ url_for('dashboard') }}">Back</a>{% endblock %}

@@ -1,0 +1,13 @@
+{% extends "base.html" %}{% block content %}
+<div class="card hero ai-visual hero-ai-watermark hero-dashboard" data-watermark="AI"><h1>Welcome, <span class="accent">{{ session.name }}</span></h1>
+<p class="lead">Take the assessment: MCQs (aptitude + technical) and coding problems. For every coding question you also
+write your <b>logic</b> in the highlighted box — our AI analyses it to measure how deeply you understand the problem.</p>
+<a class="btn" id="start-assessment" href="{{ url_for('test') }}" data-car-image="{{ url_for('static', filename='car.svg') }}">▶ Start Assessment</a></div>
+<div class="card"><h3>Your previous attempts</h3>
+{% if attempts %}<div class="table-wrap"><table><tr><th>Date</th><th>Aptitude</th><th>Technical</th><th>Coding</th><th>Logic</th><th>Placement %</th><th></th></tr>
+{% for a in attempts %}<tr><td>{{ a.created[:16] }}</td><td>{{ a.aptitude|round(0) }}</td><td>{{ a.technical|round(0) }}</td>
+<td>{{ a.coding|round(0) }}</td><td>{{ a.logic|round(0) }}</td><td><b>{{ a.probability }}%</b></td>
+<td><a href="{{ url_for('result', aid=a.id) }}">View</a></td></tr>{% endfor %}</table></div>
+{% else %}<p>No attempts yet.</p>{% endif %}</div>
+<script src="{{ url_for('static', filename='start-assessment.js') }}" defer></script>
+{% endblock %}

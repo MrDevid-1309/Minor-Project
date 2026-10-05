@@ -1,0 +1,32 @@
+{% extends "base.html" %}{% block content %}
+<div id="timer">Time left: <span id="t">30:00</span></div><br>
+<form method="post" action="{{ url_for('submit') }}" id="testForm">
+<div class="card"><h2>Section A - MCQs</h2>
+{% for q in mcqs %}<div class="q"><b>Q{{ loop.index }}. [{{ q.cat|title }}]</b> {{ q.q }}
+{% for o in q.options %}<label class="opt"><input type="radio" name="mcq_{{ q.id }}" value="{{ loop.index0 }}"> {{ o }}</label>{% endfor %}</div>{% endfor %}</div>
+
+<div class="card"><h2>Section B - Coding (Python)</h2>
+{% for p in coding %}<div class="q"><h3>{{ p.title }}</h3><p>{{ p.statement }}</p>
+<label><b>Your code</b></label>
+<textarea name="code_{{ p.id }}" rows="9" spellcheck="false">{{ p.starter }}</textarea>
+<div class="logicbox"><b>🧠 Explain your logic</b> (approach, steps, edge cases, time complexity)
+<textarea class="logic" data-qid="{{ p.id }}" name="logic_{{ p.id }}" rows="5"
+ placeholder="Example: First I will ... then ... because ... Time complexity is ..."></textarea>
+<div class="live" id="live_{{ p.id }}">AI feedback will appear here as you type...</div></div></div><hr>{% endfor %}</div>
+<button class="btn" onclick="return confirm('Submit the test?')">Submit Assessment</button></form>
+
+<script>
+let sec = 30*60; const t = document.getElementById('t');
+setInterval(()=>{ sec--; t.textContent = String(Math.floor(sec/60)).padStart(2,'0')+':'+String(sec%60).padStart(2,'0');
+  if(sec<=0) document.getElementById('testForm').submit(); },1000);
+document.querySelectorAll('.logic').forEach(box=>{
+  let timer;
+  box.addEventListener('input',()=>{ clearTimeout(timer); timer=setTimeout(async()=>{
+    const r = await fetch('{{ url_for("api_analyze_logic") }}',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({qid:box.dataset.qid,logic:box.value})});
+    const d = await r.json();
+    document.getElementById('live_'+box.dataset.qid).innerHTML =
+      `Logic score: <b>${d.score}/100</b> (${d.level}) | Words: ${d.words}<br>💡 ${d.feedback.join(' ')}`;
+  },700);});
+});
+</script>{% endblock %}
